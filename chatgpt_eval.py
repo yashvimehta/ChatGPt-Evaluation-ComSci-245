@@ -7,7 +7,6 @@ import pandas as pd
 from tqdm import tqdm
 import json
 import cv2
-from paddleocr import PaddleOCR
 from constants import RANKINGS_PROMPT
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -57,19 +56,17 @@ def get_reward(instruction, input, gt_answer, output_1, output_2):
 def main():
 
     df = pd.read_csv(args.input_filepath)
-    df = df.iloc[args.start_index:]
+    df = df.iloc[args.start_index:] # 10 index
 
     chatgpt_eval_data = []
     cnt = 0
-    reader = PaddleOCR(use_angle_cls=False, lang='en')
     for j in tqdm(range(len(df))):
         # if cnt == 20:
         #     break
 
         try:
             instruction = df.iloc[j]['question']
-            # input = ""
-            image_path = pass
+            # input = "" # to be changed
             gt_answer = pass
             output1 = pass
             output2 = pass
@@ -86,13 +83,14 @@ def main():
             elif '(b)' in feedback_1 and '(a)' in feedback_2:
                 feedback = '(b)'
             elif '(a)' in feedback_1 and '(a)' in feedback_2:
-                feedback = '(c)'
+                feedback = '(d)'
             elif '(b)' in feedback_1 and '(b)' in feedback_2:
-                feedback = '(c)'
+                feedback = '(d)'
             elif '(c)' in feedback_1 or '(c)' in feedback_2:
                 feedback = '(c)'
             else:
-                continue
+                feedback = '(d)'
+
             print(instruction)
             print(gt_answer)
             print(feedback_1, feedback_2, feedback)
