@@ -8,25 +8,25 @@ from tqdm import tqdm
 import json
 import cv2
 from constants import RANKINGS_PROMPT
+from constants import INCONTEXT_PROMPT
+from constants import QUESTION_PROMPT
+import random
+
+
+
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--gpt_version', choices=['gpt-3.5-turbo', 'gpt-4', 'gpt-3.5-turbo-16k'], default='gpt-3.5-turbo')
-parser.add_argument('--input_filepath', type = str, default = 'chatgpt_feedback/without_dolly/test_pairwise_data.csv')
+parser.add_argument('--input_filepath', type = str, default = "Downloads\Copy of docvqa.csv")
 parser.add_argument('--save_feedback_filepath', type = str, default = None)
 parser.add_argument('--start_index', type = int, default = 0)
+parser.add_argument('--no_incontext', type = int, default = 1)
+
 
 args = parser.parse_args()
 
-PROMPT_DICT = {
-    "prompt_input": (
-        "{instruction}\n\nOCR Text of the image:\n{input}"
-    ),
-    "prompt_no_input": (
-        "{instruction}"
-    ),
-}
 
 def dump_jsonl(data, output_path, append=False):
     """
@@ -40,13 +40,24 @@ def dump_jsonl(data, output_path, append=False):
     print('Wrote {} records to {}'.format(len(data), output_path))
 
 
-def get_reward(instruction, input, gt_answer, output_1, output_2):
-    if str(input) == "":
-        instruction = PROMPT_DICT['prompt_no_input'].format(instruction = instruction)
-        prompt = RANKINGS_PROMPT.format(instruction = instruction, gt_answer = gt_answer, output_1 = output_1, output_2 = output_2)
-    else:
-        instruction = PROMPT_DICT['prompt_input'].format(instruction = instruction, input = input)
-        prompt = RANKINGS_PROMPT.format(instruction = instruction, gt_answer = gt_answer,output_1 = output_1, output_2 = output_2)
+def get_reward(instruction, ocr, img_caption, output1, output2):
+    j=random.sample(range(1, 10), args.no_incontext)
+    df = pd.read_csv(args.input_filepath)
+    prompt = RANKINGS_PROMPT
+    for n in range(args.no_incontext):
+        i=n
+        instruction_ic = df.iloc[j[i]]['question']
+        gt_answer_ic = df.iloc[j[i]]['gt_answer']
+        ocr_ic = df.iloc[j[i]]['ocr']
+        img_caption_ic = df.iloc[j[i]]['img_caption']
+        output1_ic = df.iloc[j[i]]['model_a_answer']
+        output2_ic = df.iloc[j[i]]['model_b_answer']
+        label_ic =df.iloc[j[i]]['response']
+        prompt+=INCONTEXT_PROMPT.format(n=n,instruction_ic=instruction_ic,gt_answer_ic=gt_answer_ic,ocr_ic=ocr_ic,img_caption_ic=img_caption_ic,output1_ic=output1_ic,output2_ic=output2_ic,label_ic=label_ic)
+
+    prompt+=QUESTION_PROMPT.format(instruction=instruction, ocr=ocr, img_caption=img_caption, output1=output1, output2=output2)
+
+    #print("prompt",prompt)
 
     messages = [{"role": "user", "content": prompt}]
 
@@ -58,25 +69,28 @@ def main():
     df = pd.read_csv(args.input_filepath)
     df = df.iloc[args.start_index:] # 10 index
 
-    chatgpt_eval_data = []
+    
+    _eval_data = []
     cnt = 0
     for j in tqdm(range(len(df))):
-        # if cnt == 20:
-        #     break
 
         try:
             instruction = df.iloc[j]['question']
             # input = "" # to be changed
-            gt_answer = pass
-            output1 = pass
-            output2 = pass
+            # gt_answer = df.iloc[j]['gt_answer']
+            ocr= df.iloc[j]['ocr']
+            img_caption= df.iloc[j]['img_caption']
+            output1 = df.iloc[j]['model_a_answer']
+            output2 = df.iloc[j]['model_b_answer']
+            messages = get_reward(instruction, ocr, img_caption, output1, output2)
+
             completion = openai.ChatCompletion.create(
                 model = args.gpt_version, 
-                messages = get_reward(instruction, input, gt_answer, output1, output2))
+                messages = get_reward(instruction, ocr, img_caption, output1, output2))
             feedback_1 = completion['choices'][0]['message']['content']
             completion = openai.ChatCompletion.create(
                 model = args.gpt_version, 
-                messages = get_reward(instruction, input, gt_answer, output2, output1))
+                messages = get_reward(instruction, ocr, img_caption, output2, output1))
             feedback_2 = completion['choices'][0]['message']['content']
             if '(a)' in feedback_1 and '(b)' in feedback_2:
                 feedback = '(a)'
