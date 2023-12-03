@@ -38,36 +38,54 @@ You should answer using only Response (a), Response (b) or Response (c)
 To help you understand the annotation task, we provide some examples below.
 I will give an explanation for the correct answer, but you should only answer with the preferred output.
 
-### Example 1
+"""
 
-#### Instruction 1:
+INCONTEXT_PROMPT="""
 
-#### OCR Text of the image
+### Example {n}:
 
-#### Ground Truth Response 1:
+#### Instruction:
+{instruction_ic}
 
-#### Output of First AI system for Example 1:
+#### Ground Truth Response for Example:
+{gt_answer_ic}
 
-#### Output of Second AI system for Example 1:
+#### OCR Text of the image for Example:
+{ocr_ic}
 
-#### Answer for Example 1:
-Response (a)
+#### Image Caption for Example:
+{img_caption_ic}
 
-#### Human Explaination for Example 1: Indeed, Response (a) as ....
+#### Output of First AI system for Example:
+{output1_ic}
 
-## Example n+1
+#### Output of Second AI system for Example:
+{output2_ic}
 
-### Instruction n+1:
+#### Answer for Example:
+{label_ic}
+"""
+
+
+QUESTION_PROMPT="""
+Now give me answer for this test question.
+
+## Test Question 
+
+### Instruction for Test Question :
 {instruction}
 
-#### Ground Truth Response n+1:
-{gt_answer}
+#### OCR Text of the image for Test Question 
+{ocr}
 
-### Output of First AI system for Example n+1:
-{output_1}
+#### Image Caption for Test Question 
+{img_caption}
 
-### Output of Second AI system for Example n+1:
-{output_2}
+### Output of First AI system for Test Question:
+{output1}
 
-## Answer for example n+1:
+### Output of Second AI system for Test Question :
+{output2}
+
+## Answer for Test Question:
 """
