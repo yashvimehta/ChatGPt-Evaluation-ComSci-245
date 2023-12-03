@@ -70,14 +70,14 @@ def main():
     df = df.iloc[args.start_index:] # 10 index
 
     
-    _eval_data = []
+    chatgpt_eval_data = []
     cnt = 0
     for j in tqdm(range(len(df))):
 
         try:
             instruction = df.iloc[j]['question']
             # input = "" # to be changed
-            # gt_answer = df.iloc[j]['gt_answer']
+            gt_answer = df.iloc[j]['gt_answer']
             ocr= df.iloc[j]['ocr']
             img_caption= df.iloc[j]['img_caption']
             output1 = df.iloc[j]['model_a_answer']
@@ -110,6 +110,7 @@ def main():
             print(feedback_1, feedback_2, feedback)
             cnt+=1
             chatgpt_eval_data.append({
+                "question_id":j,
                 "instruction":instruction,
                 "gt_answer":gt_answer,
                 "output_1":output1,
@@ -122,6 +123,7 @@ def main():
             print('Sleeping...')
             time.sleep(5)
             chatgpt_eval_data.append({
+                "question_id":j,
                 "instruction":instruction,
                 "gt_answer":gt_answer,
                 "output_1":output1,
