@@ -23,6 +23,9 @@ parser.add_argument('--input_filepath', type = str, default = "Downloads\Copy of
 parser.add_argument('--save_feedback_filepath', type = str, default = None)
 parser.add_argument('--start_index', type = int, default = 0)
 parser.add_argument('--no_incontext', type = int, default = 1)
+# lets have 0 the default 
+parser.add_argument('--incontext_type', type = int, default = 0)
+# 0 is in domain, 1 is out of domain
 
 
 args = parser.parse_args()
@@ -40,8 +43,9 @@ def dump_jsonl(data, output_path, append=False):
     print('Wrote {} records to {}'.format(len(data), output_path))
 
 
+
 def get_reward(instruction, ocr, img_caption, output1, output2):
-    j=random.sample(range(1, 10), args.no_incontext)
+    j=random.sample(range(1, 10), args.no_incontext) # len of df
     df = pd.read_csv(args.input_filepath)
     prompt = RANKINGS_PROMPT
     for n in range(args.no_incontext):
@@ -53,11 +57,11 @@ def get_reward(instruction, ocr, img_caption, output1, output2):
         output1_ic = df.iloc[j[i]]['model_a_answer']
         output2_ic = df.iloc[j[i]]['model_b_answer']
         label_ic =df.iloc[j[i]]['response']
-        prompt+=INCONTEXT_PROMPT.format(n=n,instruction_ic=instruction_ic,gt_answer_ic=gt_answer_ic,ocr_ic=ocr_ic,img_caption_ic=img_caption_ic,output1_ic=output1_ic,output2_ic=output2_ic,label_ic=label_ic)
+        prompt= "\n".join(prompt, INCONTEXT_PROMPT.format(n=n,instruction_ic=instruction_ic,gt_answer_ic=gt_answer_ic,ocr_ic=ocr_ic,img_caption_ic=img_caption_ic,output1_ic=output1_ic,output2_ic=output2_ic,label_ic=label_ic))
 
-    prompt+=QUESTION_PROMPT.format(instruction=instruction, ocr=ocr, img_caption=img_caption, output1=output1, output2=output2)
+    prompt="\n".join(prompt, QUESTION_PROMPT.format(instruction=instruction, ocr=ocr, img_caption=img_caption, output1=output1, output2=output2))
 
-    #print("prompt",prompt)
+    # print("prompt", prompt)
 
     messages = [{"role": "user", "content": prompt}]
 
@@ -69,6 +73,18 @@ def main():
     df = pd.read_csv(args.input_filepath)
     df = df.iloc[args.start_index:] # 10 index
 
+    '''
+    if it is in domain
+    we extract 10 ex from that file itself df of 10
+
+    if it is out of domain
+    you load the other two files
+    then extract 10 samples from each
+    combine that into a df of 20 ex
+
+    get_reward(instruction, ...)
+    
+    '''
     
     chatgpt_eval_data = []
     cnt = 0
@@ -106,7 +122,6 @@ def main():
                 feedback = '(d)'
 
             print(instruction)
-            print(gt_answer)
             print(feedback_1, feedback_2, feedback)
             cnt+=1
             chatgpt_eval_data.append({
