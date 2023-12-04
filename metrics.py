@@ -236,7 +236,11 @@ class VQAEval:
         return outText
 
 
-def exact_match(pred, gt):
+def exact_match(filepath):
+    df = pd.read_csv(filepath)
+
+    model_a_em = 
+
     pass
 
 def get_response_distribution(filepath):

@@ -179,7 +179,7 @@ def main():
 
     dataset_name = args.input_filepath.split('/')[-1].split('.')[0]
     domain_context = "indomain" if args.incontext_type == 0 else "outdomain"
-    save_feedback_filepath = f"./course/output/{dataset_name}_{domain_context}_{args.no_incontext}"
+    save_feedback_filepath = f"./course/output/{dataset_name}_{domain_context}_{args.no_incontext}.jsonl"
     dump_jsonl(chatgpt_eval_data, save_feedback_filepath)
 
 if __name__ == '__main__':
