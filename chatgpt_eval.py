@@ -49,8 +49,6 @@ def get_messages(instruction, incontext_ex, ocr, img_caption, output1, output2):
     for n in range(args.no_incontext):
         i=n
         instruction_ic = incontext_ex.iloc[j[i]]['question']
-        print("here")
-        print(incontext_ex.iloc[j[i]]['gt_answer'])
         gt_answer_ic = incontext_ex.iloc[j[i]]['gt_answer']
         ocr_ic = incontext_ex.iloc[j[i]]['ocr']
         img_caption_ic = incontext_ex.iloc[j[i]]['img_caption']
@@ -66,7 +64,7 @@ def get_messages(instruction, incontext_ex, ocr, img_caption, output1, output2):
     message2 = [{"role": "user", "content": prompt2}]
     message_list = [message1, message2]
 
-    print(prompt1)
+    # print(prompt1)
     return message_list
 
 
@@ -129,8 +127,6 @@ def main():
                 messages = message_list[1])
             feedback_2 = completion['choices'][0]['message']['content']
 
-            print(feedback_1)
-            print(feedback_2)
             if '(a)' in feedback_1 and '(b)' in feedback_2:
                 feedback = '(a)'
             elif '(b)' in feedback_1 and '(a)' in feedback_2:
