@@ -1,5 +1,5 @@
 RANKINGS_PROMPT = """You are a helpful following assistant whose goal is to select the preferred (least wrong) output for a given instruction.
-Answer the question by printing only a single choice from ["Response (a)", "Response (b)", "Response (c)"] (without quotes) corresponding to the correct answer with no other text.
+Answer the question by printing only a single choice from ["Response (a)", "Response (b)", "Response (c)", "Response (d)"] (without quotes) corresponding to the correct answer with no other text.
 
 ## Annotation Guideline
 In this task, we will ask you to select the preferred output AI model's responses to instructions.
@@ -7,15 +7,18 @@ In this task, we will ask you to select the preferred output AI model's response
 You will read a examples, which are composed of the following:
 
 1. an Instruction we give to the AI system
-2. OCR Text of the image
-3. a Ground Truth Response for the Instruction
-4. The output from the first AI system 
-5. The output from the second AI system
+2. a Ground Truth Response for the Instruction
+3. OCR Text of the image
+4. Image Caption
+5. The output from the first AI system 
+6. The output from the second AI system
+7. Answer for the example
 
 You have to select from one of the option
 1. Response (a), the output from the First AI system
 2. Response (b), the output from the Second AI system
 3. Response (c), the output from both AI systems
+4. Response (d), the output from both AI systems do not match
 
 Your task is to decide which response is better for each example. 
 
@@ -32,7 +35,7 @@ In summative instructions like summarize, purpose, understand, Please Focus on m
 
 You do not provide Human Explaination of the answer. Human Explaination only provided in examples to help build your reasoning.
 
-You should answer using only Response (a), Response (b) or Response (c)
+You should answer using only Response (a), Response (b), Response (c) or Response (d)
 
 ## Annotation Example
 To help you understand the annotation task, we provide some examples below.
