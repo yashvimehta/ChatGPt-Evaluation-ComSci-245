@@ -167,7 +167,7 @@ def main():
             })
 
         cnt+=1
-        if cnt == 2:
+        if cnt==100:
             break
         if cnt%15==0:
             print("interval sleeping")
