@@ -1,1 +1,1 @@
-# Comsci-245-ST4
+This project aims to investigate whether a large language model (LLM), when provided with sufficient information through OCR (Optical Character Recognition), image captioning, and well-crafted prompts, can accurately determine which vision-language model (VLM) provides more appropriate answers to image-based questions. The research focuses on understanding the effectiveness of prompt engineering and examining if ChatGPT displays a strong primacy effect, leading to hallucination.
